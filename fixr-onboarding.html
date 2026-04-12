@@ -337,10 +337,16 @@ async function doRegister(){
     if(error)throw error;
     user=data.user;
     // Guardar en tabla users
-     user = data.user;
-document.getElementById('cemail').textContent = em;
-showM(msg,'ok','Account created! Check your email.');
-setTimeout(()=>goTo(3),1000);   }
+    if(data.user){
+      await sb.from('profiles').upsert({
+        id:data.user.id,email:em,
+        first_name:fn,last_name:ln,
+        role:(role||'HOMEOWNER').toUpperCase(),
+        referral_code:Math.random().toString(36).substring(2,8).toUpperCase(),
+        credits:1500,subscription:'FREE',
+        created_at:new Date().toISOString(),updated_at:new Date().toISOString()
+      });
+    }
     document.getElementById('cemail').textContent=em;
     showM(msg,'ok','Account created! Check your email.');
     setTimeout(()=>goTo(3),1000);
@@ -492,7 +498,5 @@ init();
 <!-- v2 -->
 </body>
 </html>
- 
- 
  
  
