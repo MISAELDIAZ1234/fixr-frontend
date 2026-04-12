@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fixr — Welcome</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:       #05050d;
+  --s1:       #0c0c1a;
+  --s2:       #13132a;
+  --s3:       #1a1a38;
+  --border:   rgba(255,255,255,0.07);
+  --border2:  rgba(255,255,255,0.12);
+  --green:    #00e5a0;
+  --green2:   #00c488;
+  --purple:   #9b8fff;
+  --blue:     #4db8ff;
+  --orange:   #ff7a45;
+  --red:      #ff4466;
+  --yellow:   #ffd166;
+  --text:     #f2f2ff;
+  --t2:       #9090b8;
+  --t3:       #44445e;
+  --r:        16px;
+  --ease:     cubic-bezier(0.22,1,0.36,1);
+}
+
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+html, body { height:100%; background:var(--bg); color:var(--text); font-family:'Instrument Sans', sans-serif; overflow:hidden; }
+
+/* ── CANVAS BG ── */
+#bgCanvas { position:fixed; inset:0; z-index:0; opacity:0.55; }
+
+/* ── WRAPPER ── */
+.app { position:relative; z-index:1; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:20px; }
+
+/* ── PROGRESS BAR TOP ── */
+.progress-track {
+  position:fixed; top:0; left:0; right:0; height:3px;
+  background:rgba(255,255,255,0.05);
+}
+.progress-fill {
+  height:100%;
+  background:linear-gradient(90deg, var(--purple), var(--green));
+  transition:width 0.5s var(--ease);
+  box-shadow: 0 0 10px var(--green);
+}
+
+/* ── STEP DOTS ── */
+.step-dots {
+  position:fixed; top:24px; left:50%; transform:translateX(-50%);
+  display:flex; gap:8px; align-items:center; z-index:10;
+}
+.sdot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--t3); transition:all 0.4s var(--ease);
+}
+.sdot.active { width:24px; border-radius:3px; background:var(--green); box-shadow:0 0 8px var(--green); }
+.sdot.done { background:var(--green2); }
+
+/* ── CARD ── */
+.card {
+  width:100%; max-width:480px;
+  background:rgba(12,12,26,0.85);
+  border:1px solid var(--border);
+  border-radius:24px;
+  backdrop-filter:blur(24px);
+  padding:40px;
+  position:relative;
+  overflow:hidden;
+  box-shadow: 0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.04) inset;
+}
+.card::before {
+  content:'';
+  position:absolute; top:-1px; left:10%; right:10%;
+  height:1px;
+  background:linear-gradient(90deg, transparent, var(--purple), var(--green), transparent);
+  opacity:0.6;
+}
+
+/* ── SCREENS ── */
+.screen { display:none; animation:screenIn 0.5s var(--ease); }
+.screen.active { display:block; }
+@keyframes screenIn {
+  from { opacity:0; transform:translateY(18px) scale(0.98); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+.screen-out { animation:screenOut 0.3s var(--ease) forwards; }
+@keyframes screenOut {
+  to { opacity:0; transform:translateY(-12px) scale(0.98); }
+}
+
+/* ── LOGO ── */
+.logo {
+  display:flex; align-items:center; gap:10px; margin-bottom:32px;
+}
+.logo-mark {
+  width:40px; height:40px; border-radius:12px;
+  background:linear-gradient(135deg, var(--purple), var(--green));
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Syne',sans-serif; font-weight:800; font-size:18px; color:#fff;
+  box-shadow:0 8px 24px rgba(155,143,255,0.35);
+}
+.logo-text { font-family:'Syne',sans-serif; font-weight:800; font-size:22px; }
+.logo-text span { color:var(--green); }
+
+/* ── TYPOGRAPHY ── */
+.eyebrow {
+  font-size:11px; font-weight:600; letter-spacing:0.12em;
+  text-transform:uppercase; color:var(--green); margin-bottom:10px;
+}
+h1 {
+  font-family:'Syne',sans-serif; font-size:28px; font-weight:800;
+  line-height:1.2; margin-bottom:10px;
+}
+h1 em { font-style:normal; color:var(--green); }
+.subtitle { font-size:15px; color:var(--t2); line-height:1.6; margin-bottom:28px; }
+
+/* ── INPUTS ── */
+.field { margin-bottom:16px; }
+.field-label {
+  display:block; font-size:11px; font-weight:600;
+  letter-spacing:0.08em; text-transform:uppercase; color:var(--t2);
+  margin-bottom:7px;
+}
+.field-input {
+  width:100%; padding:13px 16px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid var(--border);
+  border-radius:12px;
+  color:var(--text); font-family:'Instrument Sans',sans-serif; font-size:15px;
+  outline:none; transition:all 0.2s;
+}
+.field-input:focus { border-color:var(--purple); background:rgba(155,143,255,0.06); box-shadow:0 0 0 3px rgba(155,143,255,0.1); }
+.field-input::placeholder { color:var(--t3); }
+.field-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.field-icon-wrap { position:relative; }
+.field-icon-wrap .field-input { padding-left:44px; }
+.field-icon { position:absolute; left:15px; top:50%; transform:translateY(-50%); font-size:18px; pointer-events:none; }
+
+/* Password strength */
+.pw-strength { margin-top:6px; display:flex; gap:4px; }
+.pw-bar { flex:1; height:3px; border-radius:2px; background:var(--s3); transition:background 0.3s; }
+.pw-bar.weak   { background:var(--red); }
+.pw-bar.medium { background:var(--yellow); }
+.pw-bar.strong { background:var(--green); }
+
+/* ── BUTTONS ── */
+.btn-primary {
+  width:100%; padding:15px;
+  background:linear-gradient(135deg, var(--purple), var(--blue));
+  border:none; border-radius:12px;
+  color:#fff; font-family:'Syne',sans-serif; font-weight:700; font-size:15px;
+  cursor:pointer; transition:all 0.22s var(--ease);
+  box-shadow:0 8px 24px rgba(155,143,255,0.3);
+  position:relative; overflow:hidden;
+}
+.btn-primary::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(255,255,255,0.15), transparent);
+  opacity:0; transition:opacity 0.2s;
+}
+.btn-primary:hover { transform:translateY(-2px); box-shadow:0 12px 32px rgba(155,143,255,0.45); }
+.btn-primary:hover::after { opacity:1; }
+.btn-primary:active { transform:translateY(0); }
+.btn-primary:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+
+.btn-ghost {
+  width:100%; padding:13px;
+  background:transparent; border:1px solid var(--border2);
+  border-radius:12px; color:var(--t2);
+  font-family:'Instrument Sans',sans-serif; font-size:14px; font-weight:500;
+  cursor:pointer; transition:all 0.2s; margin-top:10px;
+}
+.btn-ghost:hover { background:rgba(255,255,255,0.04); color:var(--text); border-color:var(--border2); }
+
+.btn-social {
+  display:flex; align-items:center; justify-content:center; gap:10px;
+  width:100%; padding:13px;
+  background:rgba(255,255,255,0.04); border:1px solid var(--border);
+  border-radius:12px; color:var(--t2);
+  font-family:'Instrument Sans',sans-serif; font-size:14px; font-weight:500;
+  cursor:pointer; transition:all 0.2s; margin-bottom:10px;
+}
+.btn-social:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+
+/* ── DIVIDER ── */
+.divider {
+  display:flex; align-items:center; gap:12px;
+  margin:20px 0; color:var(--t3); font-size:12px;
+}
+.divider::before, .divider::after { content:''; flex:1; height:1px; background:var(--border); }
+
+/* ── ROLE SELECTOR ── */
+.role-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
+.role-card {
+  padding:20px 16px; border-radius:16px;
+  border:2px solid var(--border); background:var(--s1);
+  cursor:pointer; transition:all 0.22s var(--ease);
+  text-align:center; position:relative; overflow:hidden;
+}
+.role-card::before {
+  content:''; position:absolute; inset:0; opacity:0;
+  transition:opacity 0.3s;
+}
+.role-card.homeowner::before { background:radial-gradient(circle at 50% 0%, rgba(0,229,160,0.1), transparent 70%); }
+.role-card.pro::before       { background:radial-gradient(circle at 50% 0%, rgba(155,143,255,0.1), transparent 70%); }
+.role-card:hover { transform:translateY(-3px); border-color:var(--border2); }
+.role-card:hover::before { opacity:1; }
+.role-card.selected.homeowner { border-color:var(--green); box-shadow:0 0 0 3px rgba(0,229,160,0.1); }
+.role-card.selected.pro       { border-color:var(--purple); box-shadow:0 0 0 3px rgba(155,143,255,0.1); }
+.role-icon { font-size:36px; margin-bottom:10px; display:block; }
+.role-title { font-family:'Syne',sans-serif; font-weight:700; font-size:15px; margin-bottom:4px; }
+.role-desc { font-size:12px; color:var(--t2); line-height:1.4; }
+.role-check {
+  position:absolute; top:10px; right:10px;
+  width:20px; height:20px; border-radius:50%;
+  display:flex; align-items:center; justify-content:center;
+  font-size:10px; opacity:0; transition:opacity 0.2s;
+}
+.role-card.selected .role-check { opacity:1; }
+.role-card.selected.homeowner .role-check { background:var(--green); color:#000; }
+.role-card.selected.pro .role-check       { background:var(--purple); color:#fff; }
+
+/* ── HOME TYPE GRID ── */
+.home-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:24px; }
+.home-option {
+  padding:16px 10px; border-radius:14px;
+  border:2px solid var(--border); background:var(--s1);
+  cursor:pointer; transition:all 0.2s var(--ease);
+  text-align:center;
+}
+.home-option:hover { border-color:var(--border2); transform:translateY(-2px); }
+.home-option.selected { border-color:var(--green); background:rgba(0,229,160,0.05); }
+.home-option .ho-icon { font-size:28px; display:block; margin-bottom:7px; }
+.home-option .ho-label { font-size:12px; font-weight:600; }
+
+/* ── TAGS / PILLS ── */
+.tag-grid { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+.tag {
+  padding:8px 14px; border-radius:20px;
+  border:1px solid var(--border); background:var(--s2);
+  font-size:13px; color:var(--t2); cursor:pointer;
+  transition:all 0.18s;
+}
+.tag:hover { border-color:var(--border2); color:var(--text); }
+.tag.selected { background:rgba(0,229,160,0.1); border-color:var(--green); color:var(--green); }
+
+/* ── SLIDER ── */
+.slider-wrap { margin-bottom:20px; }
+.range-labels { display:flex; justify-content:space-between; font-size:12px; color:var(--t3); margin-top:6px; }
+input[type=range] {
+  width:100%; -webkit-appearance:none; height:4px;
+  background:var(--s3); border-radius:2px; outline:none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance:none; width:20px; height:20px; border-radius:50%;
+  background:linear-gradient(135deg,var(--purple),var(--green));
+  cursor:pointer; box-shadow:0 4px 12px rgba(155,143,255,0.5);
+}
+.range-value {
+  font-family:'Syne',sans-serif; font-weight:700; font-size:24px;
+  color:var(--green); text-align:center; margin-bottom:8px;
+}
+
+/* ── TOGGLE ── */
+.toggle-row {
+  display:flex; align-items:center; justify-content:space-between;
+  padding:14px 0; border-bottom:1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom:none; }
+.toggle-info .tl { font-size:14px; font-weight:500; }
+.toggle-info .ts { font-size:12px; color:var(--t2); margin-top:2px; }
+.toggle {
+  width:44px; height:24px; border-radius:12px;
+  background:var(--s3); cursor:pointer; position:relative;
+  transition:background 0.3s; flex-shrink:0; border:none;
+}
+.toggle.on { background:var(--green); }
+.toggle::after {
+  content:''; position:absolute; top:3px; left:3px;
+  width:18px; height:18px; border-radius:50%;
+  background:#fff; transition:transform 0.3s var(--ease);
+  box-shadow:0 2px 6px rgba(0,0,0,0.3);
+}
+.toggle.on::after { transform:translateX(20px); }
+
+/* ── AVATAR PICKER ── */
+.avatar-grid { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; justify-content:center; }
+.avatar-opt {
+  width:56px; height:56px; border-radius:50%;
+  border:2px solid var(--border); cursor:pointer;
+  transition:all 0.2s; display:flex; align-items:center;
+  justify-content:center; font-size:26px;
+  background:var(--s2);
+}
+.avatar-opt:hover { transform:scale(1.1); border-color:var(--border2); }
+.avatar-opt.selected { border-color:var(--green); box-shadow:0 0 0 3px rgba(0,229,160,0.2), 0 0 16px rgba(0,229,160,0.3); }
+
+/* ── PLAN MINI ── */
+.plan-mini-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:24px; }
+.plan-mini {
+  padding:16px 12px; border-radius:14px;
+  border:2px solid var(--border); background:var(--s1);
+  cursor:pointer; transition:all 0.2s var(--ease);
+  position:relative; overflow:hidden;
+}
+.plan-mini:hover { transform:translateY(-2px); }
+.plan-mini.selected.free     { border-color:var(--t2); }
+.plan-mini.selected.pro      { border-color:var(--green); box-shadow:0 0 0 3px rgba(0,229,160,0.1); }
+.plan-mini.selected.premium  { border-color:var(--purple); box-shadow:0 0 0 3px rgba(155,143,255,0.1); }
+.plan-mini .pm-badge {
+  position:absolute; top:-1px; left:50%; transform:translateX(-50%);
+  padding:2px 10px; border-radius:0 0 8px 8px; font-size:10px; font-weight:700;
+  background:linear-gradient(90deg,var(--purple),var(--green)); color:#fff;
+  opacity:0; transition:opacity 0.2s;
+}
+.plan-mini.selected.pro .pm-badge { opacity:1; }
+.pm-name { font-family:'Syne',sans-serif; font-weight:700; font-size:12px; margin-bottom:4px; }
+.pm-price { font-family:'Syne',sans-serif; font-weight:800; font-size:20px; margin-bottom:8px; }
+.pm-price small { font-size:11px; font-weight:400; color:var(--t2); }
+.pm-feat { font-size:11px; color:var(--t2); line-height:1.7; }
+
+/* ── VERIFY ── */
+.code-inputs { display:flex; gap:10px; justify-content:center; margin:20px 0; }
+.code-input {
+  width:52px; height:60px; border-radius:12px;
+  border:2px solid var(--border); background:var(--s2);
+  text-align:center; font-family:'Syne',sans-serif; font-weight:700;
+  font-size:24px; color:var(--text); outline:none;
+  transition:all 0.2s; caret-color:var(--green);
+}
+.code-input:focus { border-color:var(--purple); background:rgba(155,143,255,0.07); }
+.code-input.filled { border-color:var(--green); }
+
+/* ── SUCCESS ── */
+.success-orb {
+  width:90px; height:90px; border-radius:50%; margin:0 auto 20px;
+  background:radial-gradient(circle at 35% 35%, var(--green), var(--blue) 70%);
+  box-shadow:0 0 40px rgba(0,229,160,0.4), 0 0 80px rgba(0,229,160,0.15);
+  display:flex; align-items:center; justify-content:center; font-size:40px;
+  animation:orb-in 0.8s var(--ease);
+}
+@keyframes orb-in {
+  from { transform:scale(0) rotate(-20deg); opacity:0; }
+  to   { transform:scale(1) rotate(0); opacity:1; }
+}
+.success-rings {
+  position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+  pointer-events:none;
+}
+.ring-wave {
+  position:absolute; border-radius:50%; border:1px solid rgba(0,229,160,0.3);
+  animation:ring-expand 2s ease-out infinite;
+}
+.ring-wave:nth-child(2) { animation-delay:0.5s; }
+.ring-wave:nth-child(3) { animation-delay:1s; }
+@keyframes ring-expand {
+  from { width:80px; height:80px; top:-40px; left:-40px; opacity:0.6; }
+  to   { width:200px; height:200px; top:-100px; left:-100px; opacity:0; }
+}
+
+/* ── FEATURE LIST ── */
+.feature-list { display:flex; flex-direction:column; gap:10px; margin-bottom:24px; }
+.feat-item {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border-radius:12px;
+  background:rgba(255,255,255,0.02); border:1px solid var(--border);
+  animation:feat-in 0.4s var(--ease) both;
+}
+.feat-item:nth-child(1) { animation-delay:0.05s; }
+.feat-item:nth-child(2) { animation-delay:0.1s; }
+.feat-item:nth-child(3) { animation-delay:0.15s; }
+.feat-item:nth-child(4) { animation-delay:0.2s; }
+@keyframes feat-in {
+  from { opacity:0; transform:translateX(-12px); }
+  to   { opacity:1; transform:translateX(0); }
+}
+.feat-icon-wrap {
+  width:38px; height:38px; border-radius:10px; flex-shrink:0;
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.feat-body .ft { font-size:14px; font-weight:500; }
+.feat-body .fs { font-size:12px; color:var(--t2); margin-top:1px; }
+
+/* ── LINK TEXT ── */
+.link-text { color:var(--green); cursor:pointer; font-weight:500; }
+.link-text:hover { text-decoration:underline; }
+.center-text { text-align:center; font-size:13px; color:var(--t2); margin-top:14px; }
+
+/* ── TERMS ── */
+.terms-check {
+  display:flex; align-items:flex-start; gap:10px;
+  font-size:13px; color:var(--t2); margin-bottom:16px; cursor:pointer;
+}
+.custom-check {
+  width:18px; height:18px; border-radius:5px; border:1px solid var(--border2);
+  flex-shrink:0; margin-top:1px; display:flex; align-items:center;
+  justify-content:center; font-size:11px; transition:all 0.2s; background:var(--s2);
+}
+.custom-check.checked { background:var(--green); border-color:var(--green); color:#000; }
+
+/* ── NOTIFICATION ── */
+.notif-preview {
+  background:var(--s2); border:1px solid var(--border2); border-radius:14px;
+  padding:14px; display:flex; gap:12px; align-items:flex-start;
+  margin-bottom:16px; animation:notif-in 0.5s var(--ease) 0.3s both;
+}
+@keyframes notif-in {
+  from { opacity:0; transform:translateY(10px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+.notif-icon { font-size:28px; flex-shrink:0; }
+.notif-body .nt { font-size:13px; font-weight:600; margin-bottom:3px; }
+.notif-body .ns { font-size:12px; color:var(--t2); }
+
+/* ── LOCATION BAR ── */
+.loc-bar {
+  display:flex; align-items:center; gap:10px;
+  padding:13px 16px; background:rgba(0,229,160,0.06);
+  border:1px solid rgba(0,229,160,0.2); border-radius:12px; margin-bottom:16px;
+  animation:loc-in 0.5s var(--ease) 0.2s both;
+}
+@keyframes loc-in {
+  from { opacity:0; transform:scale(0.97); }
+  to   { opacity:1; transform:scale(1); }
+}
+.loc-bar .loc-icon { font-size:22px; }
+.loc-bar .loc-text .lt { font-size:13px; font-weight:600; color:var(--green); }
+.loc-bar .loc-text .ls { font-size:11px; color:var(--t2); }
+
+/* ── SCROLL INSIDE CARD ── */
+.card-scroll { max-height:calc(100vh - 100px); overflow-y:auto; padding-right:4px; }
+.card-scroll::-webkit-scrollbar { width:4px; }
+.card-scroll::-webkit-scrollbar-thumb { background:var(--s3); border-radius:2px; }
+
+/* ── LOADING SPINNER ── */
+.spinner {
+  width:20px; height:20px; border-radius:50%;
+  border:2px solid rgba(255,255,255,0.2);
+  border-top-color:#fff;
+  animation:spin 0.7s linear infinite; display:inline-block;
+}
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ── PHONE PREVIEW (right side) ── */
+.phone-preview {
+  position:fixed; right:40px; top:50%; transform:translateY(-50%);
+  width:200px; opacity:0.18; pointer-events:none;
+}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px) {
+  .card { padding:28px 22px; border-radius:20px; }
+  h1 { font-size:24px; }
+  .role-grid, .plan-mini-grid { grid-template-columns:1fr; }
+  .home-grid { grid-template-columns:repeat(2,1fr); }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+<div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+<div class="step-dots" id="stepDots"></div>
+
+<div class="app">
+  <div class="card">
+    <div class="card-scroll" id="cardScroll">
+
+      <!-- ═══ SCREEN 0: SPLASH ═══ -->
+      <div class="screen active" id="s0">
+        <div class="logo">
+          <div class="logo-mark">F</div>
+          <div><div class="logo-text">Fix<span>r</span></div></div>
+        </div>
+        <div class="eyebrow">Home Intelligence Platform</div>
+        <h1>Your home,<br><em>always fixed.</em></h1>
+        <p class="subtitle">AI-powered home repair. Expert technicians on-demand. Predictive maintenance. All in one app — designed for Austin, TX.</p>
+        <div class="feature-list">
+          <div class="feat-item">
+            <div class="feat-icon-wrap" style="background:rgba(0,229,160,0.1);">🤖</div>
+            <div class="feat-body"><div class="ft">AI Diagnosis in seconds</div><div class="fs">Describe any problem, get expert analysis</div></div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon-wrap" style="background:rgba(155,143,255,0.1);">👨‍🔧</div>
+            <div class="feat-body"><div class="ft">Vetted pros near you</div><div class="fs">Real-time matching, avg 14 min arrival</div></div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon-wrap" style="background:rgba(77,184,255,0.1);">🔧</div>
+            <div class="feat-body"><div class="ft">DIY guides for everything</div><div class="fs">Step-by-step, tools list, video walkthroughs</div></div>
+          </div>
+          <div class="feat-item">
+            <div class="feat-icon-wrap" style="background:rgba(255,209,102,0.1);">📅</div>
+            <div class="feat-body"><div class="ft">Predictive maintenance AI</div><div class="fs">Know about problems before they happen</div></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="next()">Get Started — It's Free →</button>
+        <div class="center-text">Already have an account? <span class="link-text" onclick="goTo(10)">Sign in</span></div>
+      </div>
+
+      <!-- ═══ SCREEN 1: ROLE ═══ -->
+      <div class="screen" id="s1">
+        <div class="logo"><div class="logo-mark">F</div><div><div class="logo-text">Fix<span>r</span></div></div></div>
+        <div class="eyebrow">Step 1 of 8</div>
+        <h1>Who are <em>you?</em></h1>
+        <p class="subtitle">This helps us personalize your entire experience from day one.</p>
+        <div class="role-grid">
+          <div class="role-card homeowner" id="role-homeowner" onclick="selectRole('homeowner')">
+            <div class="role-check">✓</div>
+            <span class="role-icon">🏠</span>
+            <div class="role-title">Homeowner</div>
+            <div class="role-desc">I need help fixing & maintaining my home</div>
+          </div>
+          <div class="role-card pro" id="role-pro" onclick="selectRole('pro')">
+            <div class="role-check">✓</div>
+            <span class="role-icon">👨‍🔧</span>
+            <div class="role-title">Professional</div>
+            <div class="role-desc">I'm a technician looking for jobs</div>
+          </div>
+        </div>
+        <button class="btn-primary" id="roleBtn" onclick="next()" disabled>Continue →</button>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 2: ACCOUNT ═══ -->
+      <div class="screen" id="s2">
+        <div class="eyebrow">Step 2 of 8</div>
+        <h1>Create your <em>account</em></h1>
+        <p class="subtitle">Join 12,000+ Austin homeowners already using Fixr.</p>
+        <button class="btn-social" onclick="toast('Google OAuth coming soon')">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <button class="btn-social" onclick="toast('Apple SSO coming soon')">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+          Continue with Apple
+        </button>
+        <div class="divider">or use email</div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">First Name</label>
+            <input class="field-input" type="text" placeholder="James" id="firstName">
+          </div>
+          <div class="field">
+            <label class="field-label">Last Name</label>
+            <input class="field-input" type="text" placeholder="Rivera" id="lastName">
+          </div>
+        </div>
+        <div class="field field-icon-wrap">
+          <label class="field-label">Email Address</label>
+          <span class="field-icon">✉️</span>
+          <input class="field-input" type="email" placeholder="james@email.com" id="emailInput">
+        </div>
+        <div class="field field-icon-wrap">
+          <label class="field-label">Password</label>
+          <span class="field-icon">🔒</span>
+          <input class="field-input" type="password" placeholder="Min. 8 characters" id="pwInput" oninput="checkPw(this.value)">
+          <div class="pw-strength">
+            <div class="pw-bar" id="pw1"></div>
+            <div class="pw-bar" id="pw2"></div>
+            <div class="pw-bar" id="pw3"></div>
+            <div class="pw-bar" id="pw4"></div>
+          </div>
+        </div>
+        <label class="terms-check" onclick="toggleCheck('termsCheck')">
+          <div class="custom-check" id="termsCheck"></div>
+          <span>I agree to Fixr's <span class="link-text">Terms of Service</span> and <span class="link-text">Privacy Policy</span></span>
+        </label>
+        <button class="btn-primary" onclick="next()">Create Account →</button>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 3: VERIFY PHONE ═══ -->
+      <div class="screen" id="s3">
+        <div class="eyebrow">Step 3 of 8</div>
+        <h1>Verify your <em>phone</em></h1>
+        <p class="subtitle">We'll send a 6-digit code to confirm your identity and enable emergency alerts.</p>
+        <div class="field field-icon-wrap">
+          <label class="field-label">Phone Number</label>
+          <span class="field-icon">📱</span>
+          <input class="field-input" type="tel" placeholder="+1 (512) 000-0000" id="phoneInput" value="+1 (512) ">
+        </div>
+        <button class="btn-primary" onclick="sendCode()" id="sendCodeBtn">Send Verification Code →</button>
+        <div id="codeSection" style="display:none; margin-top:20px;">
+          <p style="font-size:13px;color:var(--t2);margin-bottom:16px;text-align:center;">Enter the 6-digit code sent to your phone</p>
+          <div class="code-inputs" id="codeInputs">
+            <input class="code-input" maxlength="1" oninput="codeInput(this,0)" onkeydown="codeBack(event,this,0)">
+            <input class="code-input" maxlength="1" oninput="codeInput(this,1)" onkeydown="codeBack(event,this,1)">
+            <input class="code-input" maxlength="1" oninput="codeInput(this,2)" onkeydown="codeBack(event,this,2)">
+            <input class="code-input" maxlength="1" oninput="codeInput(this,3)" onkeydown="codeBack(event,this,3)">
+            <input class="code-input" maxlength="1" oninput="codeInput(this,4)" onkeydown="codeBack(event,this,4)">
+            <input class="code-input" maxlength="1" oninput="codeInput(this,5)" onkeydown="codeBack(event,this,5)">
+          </div>
+          <p style="font-size:12px;color:var(--t3);text-align:center;">Didn't get it? <span class="link-text" onclick="toast('New code sent!')">Resend in 0:45</span></p>
+        </div>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 4: HOME TYPE ═══ -->
+      <div class="screen" id="s4">
+        <div class="eyebrow">Step 4 of 8</div>
+        <h1>Tell us about <em>your home</em></h1>
+        <p class="subtitle">We use this to personalize maintenance reminders and find the right pros for your property type.</p>
+        <div class="home-grid">
+          <div class="home-option" onclick="selectHome(this,'Single Family')"><span class="ho-icon">🏡</span><div class="ho-label">Single Family</div></div>
+          <div class="home-option" onclick="selectHome(this,'Condo/Apt')"><span class="ho-icon">🏢</span><div class="ho-label">Condo / Apt</div></div>
+          <div class="home-option" onclick="selectHome(this,'Townhouse')"><span class="ho-icon">🏘️</span><div class="ho-label">Townhouse</div></div>
+          <div class="home-option" onclick="selectHome(this,'Duplex')"><span class="ho-icon">🏠</span><div class="ho-label">Duplex</div></div>
+          <div class="home-option" onclick="selectHome(this,'Mobile Home')"><span class="ho-icon">🚐</span><div class="ho-label">Mobile Home</div></div>
+          <div class="home-option" onclick="selectHome(this,'Commercial')"><span class="ho-icon">🏪</span><div class="ho-label">Commercial</div></div>
+        </div>
+        <div class="field">
+          <label class="field-label">Home Address</label>
+          <input class="field-input" type="text" placeholder="1234 Barton Springs Rd, Austin, TX" id="addressInput" value="Austin, TX">
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label class="field-label">Year Built</label>
+            <input class="field-input" type="number" placeholder="2005" id="yearBuilt">
+          </div>
+          <div class="field">
+            <label class="field-label">Square Footage</label>
+            <input class="field-input" type="number" placeholder="1,800" id="sqft">
+          </div>
+        </div>
+        <button class="btn-primary" onclick="next()">Continue →</button>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 5: INTERESTS ═══ -->
+      <div class="screen" id="s5">
+        <div class="eyebrow">Step 5 of 8</div>
+        <h1>What systems does <em>your home have?</em></h1>
+        <p class="subtitle">Select all that apply — we'll set up the right maintenance schedule for you.</p>
+        <div class="tag-grid" id="systemTags">
+          <div class="tag" onclick="toggleTag(this)">❄️ Central AC</div>
+          <div class="tag" onclick="toggleTag(this)">🔥 Gas Heating</div>
+          <div class="tag" onclick="toggleTag(this)">💧 Water Heater</div>
+          <div class="tag" onclick="toggleTag(this)">🌊 Pool / Spa</div>
+          <div class="tag" onclick="toggleTag(this)">⚡ Solar Panels</div>
+          <div class="tag" onclick="toggleTag(this)">🌱 Sprinkler System</div>
+          <div class="tag" onclick="toggleTag(this)">🔒 Smart Home</div>
+          <div class="tag" onclick="toggleTag(this)">🚗 EV Charger</div>
+          <div class="tag" onclick="toggleTag(this)">🏠 Sump Pump</div>
+          <div class="tag" onclick="toggleTag(this)">🌬️ Ventilation</div>
+          <div class="tag" onclick="toggleTag(this)">🔌 Generator</div>
+          <div class="tag" onclick="toggleTag(this)">📡 Security System</div>
+        </div>
+        <div class="slider-wrap">
+          <label class="field-label">How often do you do DIY repairs?</label>
+          <div class="range-value" id="diyFreqVal">Sometimes</div>
+          <input type="range" min="0" max="3" value="1" oninput="updateDiyFreq(this.value)">
+          <div class="range-labels"><span>Never</span><span>Sometimes</span><span>Often</span><span>Always</span></div>
+        </div>
+        <button class="btn-primary" onclick="next()">Continue →</button>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 6: NOTIFICATIONS ═══ -->
+      <div class="screen" id="s6">
+        <div class="eyebrow">Step 6 of 8</div>
+        <h1>Stay <em>informed</em></h1>
+        <p class="subtitle">Never miss a maintenance reminder, technician arrival, or emergency alert.</p>
+        <div class="notif-preview">
+          <div class="notif-icon">🔔</div>
+          <div class="notif-body">
+            <div class="nt">Fixr — Maintenance Reminder</div>
+            <div class="ns">Your AC filter is due in 3 days. Tap to schedule a $29 service. 🏠</div>
+          </div>
+        </div>
+        <div style="margin-bottom:20px;">
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="tl">🚨 Emergency Alerts</div><div class="ts">Gas leaks, flooding, critical issues</div></div>
+            <button class="toggle on" id="t1" onclick="toggleBtn(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="tl">📅 Maintenance Reminders</div><div class="ts">AI-powered preventive care schedule</div></div>
+            <button class="toggle on" id="t2" onclick="toggleBtn(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="tl">👨‍🔧 Technician Updates</div><div class="ts">Booking confirmations, tracking, arrival</div></div>
+            <button class="toggle on" id="t3" onclick="toggleBtn(this)"></button>
+          </div>
+          <div class="toggle-row">
+            <div class="toggle-info"><div class="tl">💰 Deals & Promotions</div><div class="ts">Seasonal discounts, partner offers</div></div>
+            <button class="toggle" id="t4" onclick="toggleBtn(this)"></button>
+          </div>
+        </div>
+        <div class="loc-bar">
+          <div class="loc-icon">📍</div>
+          <div class="loc-text"><div class="lt">Austin, TX detected</div><div class="ls">12 professionals available in your area</div></div>
+        </div>
+        <button class="btn-primary" onclick="next()">Enable & Continue →</button>
+        <button class="btn-ghost" onclick="next()">Skip for now</button>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 7: AVATAR ═══ -->
+      <div class="screen" id="s7">
+        <div class="eyebrow">Step 7 of 8</div>
+        <h1>Make it <em>yours</em></h1>
+        <p class="subtitle">Pick an avatar and customize your profile. You can always change this later.</p>
+        <p style="font-size:12px;color:var(--t2);text-align:center;margin-bottom:12px;">Choose avatar</p>
+        <div class="avatar-grid">
+          <div class="avatar-opt selected" onclick="selectAvatar(this)">🧑</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">👩</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">👨‍🦱</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">👩‍🦰</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">🧔</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">👴</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">🧓</div>
+          <div class="avatar-opt" onclick="selectAvatar(this)">🦸</div>
+        </div>
+        <div class="field">
+          <label class="field-label">Display Name</label>
+          <input class="field-input" type="text" id="displayName" placeholder="James R." value="James R.">
+        </div>
+        <div class="field">
+          <label class="field-label">Referral Code (optional)</label>
+          <input class="field-input" type="text" id="refCode" placeholder="Enter a friend's code for $15 credit">
+        </div>
+        <button class="btn-primary" onclick="next()">Almost There →</button>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 8: PLAN ═══ -->
+      <div class="screen" id="s8">
+        <div class="eyebrow">Step 8 of 8</div>
+        <h1>Choose your <em>plan</em></h1>
+        <p class="subtitle">Start free. Upgrade anytime. Cancel anytime. Most homeowners save $800+/year.</p>
+        <div class="plan-mini-grid">
+          <div class="plan-mini free selected" id="plan-free" onclick="selectPlan('free')">
+            <div class="pm-badge">Popular</div>
+            <div class="pm-name" style="color:var(--t2)">FREE</div>
+            <div class="pm-price">$0<small>/mo</small></div>
+            <div class="pm-feat">3 diagnoses/mo<br>Marketplace access<br>Basic maintenance</div>
+          </div>
+          <div class="plan-mini pro" id="plan-pro" onclick="selectPlan('pro')">
+            <div class="pm-badge">Best Value</div>
+            <div class="pm-name" style="color:var(--green)">PRO</div>
+            <div class="pm-price" style="color:var(--green)">$29<small>/mo</small></div>
+            <div class="pm-feat">Unlimited AI<br>10% discount<br>Priority booking</div>
+          </div>
+          <div class="plan-mini premium" id="plan-premium" onclick="selectPlan('premium')">
+            <div class="pm-badge">Full Cover</div>
+            <div class="pm-name" style="color:var(--purple)">HOME+</div>
+            <div class="pm-price" style="color:var(--purple)">$79<small>/mo</small></div>
+            <div class="pm-feat">Everything in Pro<br>$500 warranty<br>Home manager</div>
+          </div>
+        </div>
+        <div style="background:rgba(0,229,160,0.04);border:1px solid rgba(0,229,160,0.15);border-radius:12px;padding:14px;margin-bottom:20px;">
+          <p style="font-size:13px;color:var(--t2);"><strong style="color:var(--green)">🎁 Launch offer:</strong> First month Pro FREE for Austin users. No credit card required to start.</p>
+        </div>
+        <button class="btn-primary" onclick="next()">Start for Free — Activate Account →</button>
+        <button class="btn-ghost" onclick="prev()">← Back</button>
+      </div>
+
+      <!-- ═══ SCREEN 9: SUCCESS ═══ -->
+      <div class="screen" id="s9">
+        <div style="text-align:center;position:relative;padding:10px 0 20px;">
+          <div style="position:relative;display:inline-block;">
+            <div class="success-rings"><div class="ring-wave"></div><div class="ring-wave"></div><div class="ring-wave"></div></div>
+            <div class="success-orb">🏠</div>
+          </div>
+          <h1 style="margin-top:16px;">You're all set,<br><em>James!</em></h1>
+          <p class="subtitle">Welcome to Fixr. Your home is now protected by AI. Austin's best technicians are ready for you.</p>
+        </div>
+        <div style="background:var(--s2);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:20px;">
+          <div style="font-size:12px;color:var(--t2);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.08em;">Your Setup Summary</div>
+          <div style="display:flex;flex-direction:column;gap:7px;">
+            <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--t2)">Home type</span><span id="summaryHome">Single Family</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--t2)">Location</span><span>Austin, TX</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--t2)">Plan</span><span id="summaryPlan" style="color:var(--green)">Free</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--t2)">Pros nearby</span><span style="color:var(--green)">12 available now</span></div>
+            <div style="display:flex;justify-content:space-between;font-size:13px;"><span style="color:var(--t2)">Sign-up bonus</span><span style="color:var(--yellow)">🎁 $15 credit added</span></div>
+          </div>
+        </div>
+        <button class="btn-primary" onclick="goToDashboard()">
+          <span id="dashBtnText">Go to My Dashboard →</span>
+        </button>
+        <p style="text-align:center;font-size:12px;color:var(--t3);margin-top:14px;">📱 Download the Fixr mobile app for the best experience</p>
+      </div>
+
+      <!-- ═══ SCREEN 10: SIGN IN ═══ -->
+      <div class="screen" id="s10">
+        <div class="logo"><div class="logo-mark">F</div><div><div class="logo-text">Fix<span>r</span></div></div></div>
+        <div class="eyebrow">Welcome Back</div>
+        <h1>Sign <em>in</em></h1>
+        <p class="subtitle">Good to see you again. Your home has been waiting.</p>
+        <button class="btn-social" onclick="toast('Google sign-in coming soon')">
+          <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+          Continue with Google
+        </button>
+        <div class="divider">or</div>
+        <div class="field field-icon-wrap">
+          <label class="field-label">Email</label>
+          <span class="field-icon">✉️</span>
+          <input class="field-input" type="email" placeholder="your@email.com">
+        </div>
+        <div class="field field-icon-wrap">
+          <label class="field-label">Password</label>
+          <span class="field-icon">🔒</span>
+          <input class="field-input" type="password" placeholder="••••••••">
+        </div>
+        <div style="text-align:right;margin-top:-8px;margin-bottom:16px;"><span class="link-text" style="font-size:13px;">Forgot password?</span></div>
+        <button class="btn-primary" onclick="goTo(9)">Sign In →</button>
+        <div class="center-text">New to Fixr? <span class="link-text" onclick="goTo(0)">Create account</span></div>
+      </div>
+
+    </div><!-- /card-scroll -->
+  </div><!-- /card -->
+</div>
+
+<!-- TOAST -->
+<div id="toastEl" style="position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(12px);background:var(--s2);border:1px solid var(--border2);color:var(--text);padding:11px 20px;border-radius:10px;font-size:13px;z-index:1000;opacity:0;transition:all 0.3s;pointer-events:none;white-space:nowrap;box-shadow:0 8px 32px rgba(0,0,0,0.5);">
+</div>
+
+<script>
+// ─── STATE ───────────────────────────────────────────
+let currentStep = 0;
+const TOTAL_STEPS = 9; // 0–8 are the onboarding steps
+let selectedRoleVal = null;
+let selectedHomeType = 'Single Family';
+let selectedPlanVal = 'free';
+let checkedTerms = false;
+
+// Screens mapping: step index → screen id
+const stepScreens = ['s0','s1','s2','s3','s4','s5','s6','s7','s8','s9'];
+
+// ─── INIT ─────────────────────────────────────────────
+function init() {
+  buildDots();
+  updateProgress();
+  drawBg();
+}
+
+// ─── DOTS ─────────────────────────────────────────────
+function buildDots() {
+  const container = document.getElementById('stepDots');
+  container.innerHTML = '';
+  // Only show dots for onboarding steps (1-8, skip splash)
+  for (let i = 1; i <= 8; i++) {
+    const d = document.createElement('div');
+    d.className = 'sdot';
+    d.id = 'dot' + i;
+    container.appendChild(d);
+  }
+  updateDots();
+}
+
+function updateDots() {
+  for (let i = 1; i <= 8; i++) {
+    const d = document.getElementById('dot' + i);
+    if (!d) continue;
+    d.className = 'sdot';
+    if (i < currentStep) d.classList.add('done');
+    else if (i === currentStep) d.classList.add('active');
+  }
+}
+
+// ─── PROGRESS ─────────────────────────────────────────
+function updateProgress() {
+  const pct = currentStep === 0 ? 0 : Math.round((currentStep / 8) * 100);
+  document.getElementById('progressFill').style.width = pct + '%';
+}
+
+// ─── NAVIGATION ───────────────────────────────────────
+function next() {
+  const from = stepScreens[currentStep];
+  if (currentStep < stepScreens.length - 1) {
+    currentStep++;
+    transition(from, stepScreens[currentStep]);
+    updateDots();
+    updateProgress();
+    document.getElementById('cardScroll').scrollTop = 0;
+  }
+}
+
+function prev() {
+  if (currentStep > 0) {
+    const from = stepScreens[currentStep];
+    currentStep--;
+    transition(from, stepScreens[currentStep]);
+    updateDots();
+    updateProgress();
+    document.getElementById('cardScroll').scrollTop = 0;
+  }
+}
+
+function goTo(step) {
+  const from = stepScreens[currentStep];
+  currentStep = step;
+  transition(from, stepScreens[currentStep]);
+  updateDots();
+  updateProgress();
+  document.getElementById('cardScroll').scrollTop = 0;
+}
+
+function transition(fromId, toId) {
+  const from = document.getElementById(fromId);
+  const to   = document.getElementById(toId);
+  from.classList.add('screen-out');
+  setTimeout(() => {
+    from.classList.remove('active','screen-out');
+    to.classList.add('active');
+  }, 280);
+}
+
+// ─── ROLE SELECTION ───────────────────────────────────
+function selectRole(role) {
+  selectedRoleVal = role;
+  document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+  document.getElementById('role-' + role).classList.add('selected');
+  document.getElementById('roleBtn').disabled = false;
+}
+
+// ─── HOME TYPE ────────────────────────────────────────
+function selectHome(el, type) {
+  selectedHomeType = type;
+  document.querySelectorAll('.home-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('summaryHome').textContent = type;
+}
+
+// ─── TAGS ─────────────────────────────────────────────
+function toggleTag(el) { el.classList.toggle('selected'); }
+
+// ─── PASSWORD STRENGTH ────────────────────────────────
+function checkPw(val) {
+  const bars = [document.getElementById('pw1'),document.getElementById('pw2'),document.getElementById('pw3'),document.getElementById('pw4')];
+  bars.forEach(b => { b.className = 'pw-bar'; });
+  if (!val) return;
+  const strength = val.length >= 12 && /[A-Z]/.test(val) && /[0-9]/.test(val) && /[^a-zA-Z0-9]/.test(val) ? 4
+    : val.length >= 10 && /[A-Z]/.test(val) && /[0-9]/.test(val) ? 3
+    : val.length >= 8 ? 2 : 1;
+  const cls = strength <= 1 ? 'weak' : strength <= 2 ? 'medium' : strength <= 3 ? 'medium' : 'strong';
+  for (let i = 0; i < strength; i++) { bars[i].classList.add(cls); }
+}
+
+// ─── TERMS CHECK ──────────────────────────────────────
+function toggleCheck(id) {
+  const el = document.getElementById(id);
+  checkedTerms = !checkedTerms;
+  el.classList.toggle('checked', checkedTerms);
+  el.textContent = checkedTerms ? '✓' : '';
+}
+
+// ─── TOGGLE BUTTONS ───────────────────────────────────
+function toggleBtn(el) { el.classList.toggle('on'); }
+
+// ─── AVATAR ───────────────────────────────────────────
+function selectAvatar(el) {
+  document.querySelectorAll('.avatar-opt').forEach(a => a.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ─── DIY FREQ ─────────────────────────────────────────
+const diyLabels = ['Never','Sometimes','Often','Always'];
+function updateDiyFreq(v) {
+  document.getElementById('diyFreqVal').textContent = diyLabels[v];
+}
+
+// ─── PHONE CODE ───────────────────────────────────────
+function sendCode() {
+  const btn = document.getElementById('sendCodeBtn');
+  btn.innerHTML = '<div class="spinner"></div> Sending...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.innerHTML = '✅ Code sent to your phone';
+    document.getElementById('codeSection').style.display = 'block';
+    document.querySelector('.code-input').focus();
+    toast('Demo code: 1 2 3 4 5 6');
+  }, 1500);
+}
+
+function codeInput(el, idx) {
+  el.classList.add('filled');
+  const inputs = document.querySelectorAll('.code-input');
+  if (el.value && idx < 5) inputs[idx + 1].focus();
+  // Auto-advance if all filled
+  const vals = Array.from(inputs).map(i => i.value);
+  if (vals.every(v => v)) {
+    setTimeout(() => next(), 400);
+  }
+}
+
+function codeBack(e, el, idx) {
+  if (e.key === 'Backspace' && !el.value && idx > 0) {
+    document.querySelectorAll('.code-input')[idx - 1].focus();
+  }
+}
+
+// ─── PLAN ─────────────────────────────────────────────
+function selectPlan(plan) {
+  selectedPlanVal = plan;
+  document.querySelectorAll('.plan-mini').forEach(p => p.classList.remove('selected'));
+  document.getElementById('plan-' + plan).classList.add('selected', plan);
+  const labels = { free:'Free', pro:'Pro — $29/mo', premium:'Home+ — $79/mo' };
+  document.getElementById('summaryPlan').textContent = labels[plan];
+  document.getElementById('summaryPlan').style.color = plan === 'free' ? 'var(--t2)' : plan === 'pro' ? 'var(--green)' : 'var(--purple)';
+}
+
+// ─── DASHBOARD ────────────────────────────────────────
+function goToDashboard() {
+  const btn = document.getElementById('dashBtnText');
+  btn.parentElement.innerHTML = '<div class="spinner"></div> Loading your dashboard...';
+  setTimeout(() => {
+    toast('🎉 Redirecting to Fixr Dashboard...');
+    // In production: window.location.href = '/dashboard'
+  }, 1200);
+}
+
+// ─── TOAST ────────────────────────────────────────────
+function toast(msg) {
+  const t = document.getElementById('toastEl');
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(t._tid);
+  t._tid = setTimeout(() => {
+    t.style.opacity = '0';
+    t.style.transform = 'translateX(-50%) translateY(12px)';
+  }, 2800);
+}
+
+// ─── CANVAS BACKGROUND ────────────────────────────────
+function drawBg() {
+  const canvas = document.getElementById('bgCanvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, particles;
+
+  function resize() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
+    initParticles();
+  }
+
+  function initParticles() {
+    particles = Array.from({length: 60}, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      r: Math.random() * 1.5 + 0.3,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      color: Math.random() > 0.5 ? '#9b8fff' : '#00e5a0',
+      alpha: Math.random() * 0.4 + 0.1
+    }));
+  }
+
+  // Grid lines
+  function drawGrid() {
+    ctx.strokeStyle = 'rgba(120,120,255,0.04)';
+    ctx.lineWidth = 1;
+    const gridSize = 60;
+    for (let x = 0; x < w; x += gridSize) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, h); ctx.stroke();
+    }
+    for (let y = 0; y < h; y += gridSize) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(w, y); ctx.stroke();
+    }
+  }
+
+  // Glowing orbs
+  function drawOrbs() {
+    const orbs = [
+      { x: w * 0.15, y: h * 0.2, r: 200, color: '#9b8fff' },
+      { x: w * 0.85, y: h * 0.8, r: 250, color: '#00e5a0' },
+      { x: w * 0.7,  y: h * 0.15, r: 150, color: '#4db8ff' },
+    ];
+    orbs.forEach(o => {
+      const g = ctx.createRadialGradient(o.x, o.y, 0, o.x, o.y, o.r);
+      g.addColorStop(0, o.color + '22');
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, w, h);
+    drawGrid();
+    drawOrbs();
+    // Particles
+    particles.forEach(p => {
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+      ctx.fill();
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0 || p.x > w) p.vx *= -1;
+      if (p.y < 0 || p.y > h) p.vy *= -1;
+    });
+    ctx.globalAlpha = 1;
+    requestAnimationFrame(animate);
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+  animate();
+}
+
+// ─── KEYBOARD ─────────────────────────────────────────
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && e.ctrlKey) next();
+});
+
+init();
+</script>
+</body>
+</html>
