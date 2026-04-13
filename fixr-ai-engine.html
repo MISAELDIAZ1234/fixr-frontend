@@ -1076,7 +1076,7 @@ function removeElement(id) {
   if (el) el.remove();
 }
 
-function autoResize(el) {
+window.autoResize = function(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
@@ -1096,6 +1096,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
+ 
  
  
  
