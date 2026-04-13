@@ -361,20 +361,6 @@
     .left, .right { display:none; }
   }
 </style>
-<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-<script>
-const SB_URL = 'https://gcditckiofafjkadfkji.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZGl0Y2tpb2ZhZmprYWRma2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5NzA4OTYsImV4cCI6MjA5MTU0Njg5Nn0.2HFG1np2oKbixVkJZ49b8SXbC8xsIMzGLRNOJhqWuyk';
-const { createClient } = supabase;
-const sb = createClient(SB_URL, SB_KEY);
-
-(async function() {
-  const { data } = await sb.auth.getSession();
-  if (!data.session) {
-    window.location.href = '/fixr-onboarding.html';
-  }
-})();
-</script>
 </head>
 <body>
 
@@ -608,7 +594,7 @@ function quickPrompt(text) {
 }
 
 // ─── SEND MESSAGE ─────────────────────────────────────
-window.sendMessage = function() {
+async function sendMessage() {
   if (isStreaming) return;
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
@@ -664,43 +650,13 @@ window.sendMessage = function() {
 
 // ─── CLAUDE API ───────────────────────────────────────
 async function callClaude(thinkId) {
-  try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 1500,
-        system: `You are Fixr AI, an expert home repair assistant for US homeowners.
-Category: ${selectedCategory}. Location: Austin, TX.
-Always structure your response with these sections:
-## 🔍 Diagnosis
-## 🚨 Urgency (LOW/MEDIUM/HIGH/CRITICAL)
-## 💰 Cost Estimate
-- DIY cost: $X–$Y
-- Pro cost: $X–$Y
-## 🔧 Fix Options
-### DIY Steps (numbered)
-### Hire a Pro (what to ask for)
-## 📦 Materials Needed
-## 💡 Pro Tips
-Be warm, specific, and practical. Use emojis.`,
-        messages: messages
-      })
-    });
+  const systemPrompt = `You are Fixr AI, an expert home repair and maintenance assistant embedded in a premium home services platform called Fixr (like Uber for home repairs). You have deep expertise in plumbing, electrical systems, HVAC, appliances, roofing, structural issues, and all home systems.
 
-    const data = await response.json();
-    const fullText = data.content[0].text;
+Current context:
+- User location: Austin, TX
+- Category selected: ${selectedCategory}
+- Mode: ${diyMode ? 'DIY Focus' : 'Full Service (DIY + Pro options)'}
 
-    removeElement(thinkId);
-    messages.push({ role: 'assistant', content: fullText });
-    await appendAiMsgStream(fullText, null);
-
-  } catch(err) {
-    removeElement(thinkId);
-    appendAiMsg('⚠️ Connection error. Please try again. ' + err.message);
-  }
-}
 When diagnosing a home problem, ALWAYS structure your response with these sections using markdown:
 
 ## 🔍 Diagnosis
@@ -1076,12 +1032,12 @@ function removeElement(id) {
   if (el) el.remove();
 }
 
-window.autoResize = function(el) {
+function autoResize(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-window.handleKey = function(e) {
+function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
@@ -1096,8 +1052,3 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
- 
- 
- 
- 
- 
