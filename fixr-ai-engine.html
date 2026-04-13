@@ -664,13 +664,43 @@ async function sendMessage() {
 
 // ─── CLAUDE API ───────────────────────────────────────
 async function callClaude(thinkId) {
-  const systemPrompt = `You are Fixr AI, an expert home repair and maintenance assistant embedded in a premium home services platform called Fixr (like Uber for home repairs). You have deep expertise in plumbing, electrical systems, HVAC, appliances, roofing, structural issues, and all home systems.
+  try {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1500,
+        system: `You are Fixr AI, an expert home repair assistant for US homeowners.
+Category: ${selectedCategory}. Location: Austin, TX.
+Always structure your response with these sections:
+## 🔍 Diagnosis
+## 🚨 Urgency (LOW/MEDIUM/HIGH/CRITICAL)
+## 💰 Cost Estimate
+- DIY cost: $X–$Y
+- Pro cost: $X–$Y
+## 🔧 Fix Options
+### DIY Steps (numbered)
+### Hire a Pro (what to ask for)
+## 📦 Materials Needed
+## 💡 Pro Tips
+Be warm, specific, and practical. Use emojis.`,
+        messages: messages
+      })
+    });
 
-Current context:
-- User location: Austin, TX
-- Category selected: ${selectedCategory}
-- Mode: ${diyMode ? 'DIY Focus' : 'Full Service (DIY + Pro options)'}
+    const data = await response.json();
+    const fullText = data.content[0].text;
 
+    removeElement(thinkId);
+    messages.push({ role: 'assistant', content: fullText });
+    await appendAiMsgStream(fullText, null);
+
+  } catch(err) {
+    removeElement(thinkId);
+    appendAiMsg('⚠️ Connection error. Please try again. ' + err.message);
+  }
+}
 When diagnosing a home problem, ALWAYS structure your response with these sections using markdown:
 
 ## 🔍 Diagnosis
@@ -1066,4 +1096,5 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
+ 
  
