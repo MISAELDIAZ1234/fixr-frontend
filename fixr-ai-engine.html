@@ -361,6 +361,20 @@
     .left, .right { display:none; }
   }
 </style>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://gcditckiofafjkadfkji.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZGl0Y2tpb2ZhZmprYWRma2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5NzA4OTYsImV4cCI6MjA5MTU0Njg5Nn0.2HFG1np2oKbixVkJZ49b8SXbC8xsIMzGLRNOJhqWuyk';
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_KEY);
+
+(async function() {
+  const { data } = await sb.auth.getSession();
+  if (!data.session) {
+    window.location.href = '/fixr-onboarding.html';
+  }
+})();
+</script>
 </head>
 <body>
 
@@ -1052,3 +1066,4 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
+ 
