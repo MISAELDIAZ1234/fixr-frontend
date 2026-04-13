@@ -608,7 +608,7 @@ function quickPrompt(text) {
 }
 
 // ─── SEND MESSAGE ─────────────────────────────────────
-async function sendMessage() {
+window.sendMessage = function() {
   if (isStreaming) return;
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
@@ -1096,6 +1096,7 @@ function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
 </script>
 </body>
 </html>
+ 
  
  
  
