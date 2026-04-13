@@ -362,6 +362,35 @@
   .star-btn { font-size:24px; cursor:pointer; color:var(--surface3); transition:var(--transition); }
   .star-btn.active, .star-btn:hover { color:var(--warn); }
 </style>
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://gcditckiofafjkadfkji.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZGl0Y2tpb2ZhZmprYWRma2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5NzA4OTYsImV4cCI6MjA5MTU0Njg5Nn0.2HFG1np2oKbixVkJZ49b8SXbC8xsIMzGLRNOJhqWuyk';
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_KEY);
+
+// Verificar sesión al cargar
+(async function() {
+  const { data } = await sb.auth.getSession();
+  if (!data.session) {
+    // No hay sesión — mandar al onboarding
+    window.location.href = '/fixr-onboarding.html';
+    return;
+  }
+  // Hay sesión — cargar datos del usuario
+  const user = data.session.user;
+  const name = user.user_metadata?.first_name || user.email?.split('@')[0] || 'User';
+  localStorage.setItem('fixr_user', JSON.stringify({ id: user.id, email: user.email, name }));
+
+  // Actualizar nombre en el dashboard
+  document.addEventListener('DOMContentLoaded', () => {
+    const nameEl = document.querySelector('.syne');
+    if (nameEl && nameEl.textContent.includes('James')) {
+      nameEl.textContent = nameEl.textContent.replace('James Rivera', name);
+    }
+  });
+})();
+</script>
 </head>
 <body>
 
@@ -1434,3 +1463,4 @@ document.querySelectorAll('.stat-value').forEach(el => {
 </script>
 </body>
 </html>
+ 
