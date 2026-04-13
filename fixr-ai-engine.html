@@ -5,6 +5,17 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Fixr — AI Home Expert (Live)</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Geist+Mono:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+<script>
+const SB_URL = 'https://gcditckiofafjkadfkji.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdjZGl0Y2tpb2ZhZmprYWRma2ppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU5NzA4OTYsImV4cCI6MjA5MTU0Njg5Nn0.2HFG1np2oKbixVkJZ49b8SXbC8xsIMzGLRNOJhqWuyk';
+const { createClient } = supabase;
+const sb = createClient(SB_URL, SB_KEY);
+(async function() {
+  const { data } = await sb.auth.getSession();
+  if (!data.session) { window.location.href = '/fixr-onboarding.html'; }
+})();
+</script>
 <style>
   :root {
     --bg: #080810;
@@ -579,7 +590,7 @@ let diyMode = false;
 let voiceMode = false;
 
 // ─── CATEGORY ────────────────────────────────────────
-function setCategory(el, cat) {
+window.setCategory = function(el, cat) {
   document.querySelectorAll('.cat-pill').forEach(p => p.classList.remove('active'));
   el.classList.add('active');
   selectedCategory = cat;
@@ -587,14 +598,14 @@ function setCategory(el, cat) {
 }
 
 // ─── QUICK PROMPT ─────────────────────────────────────
-function quickPrompt(text) {
+window.quickPrompt = function(text) {
   document.getElementById('msgInput').value = text;
   autoResize(document.getElementById('msgInput'));
   sendMessage();
 }
 
 // ─── SEND MESSAGE ─────────────────────────────────────
-async function sendMessage() {
+window.sendMessage = async function() {
   if (isStreaming) return;
   const input = document.getElementById('msgInput');
   const text = input.value.trim();
@@ -921,7 +932,7 @@ function updateRightPanel(data) {
 }
 
 // ─── FILE UPLOAD ──────────────────────────────────────
-function triggerUpload() {
+window.triggerUpload = function() {
   document.getElementById('fileInput').click();
 }
 
@@ -973,7 +984,7 @@ dropTarget.addEventListener('drop', e => {
 });
 
 // ─── VOICE (simulated) ────────────────────────────────
-function toggleVoice() {
+window.toggleVoice = function() {
   voiceMode = !voiceMode;
   const btn = document.getElementById('voiceBtn');
   btn.classList.toggle('active', voiceMode);
@@ -996,7 +1007,7 @@ function toggleVoice() {
 }
 
 // ─── DIY MODE ────────────────────────────────────────
-function toggleMode() {
+window.toggleMode = function() {
   diyMode = !diyMode;
   const btn = document.getElementById('modeBtn');
   btn.classList.toggle('active', diyMode);
@@ -1005,7 +1016,7 @@ function toggleMode() {
 }
 
 // ─── UI HELPERS ───────────────────────────────────────
-function clearChat() {
+window.clearChat = function() {
   messages = [];
   const msgs = document.getElementById('messages');
   msgs.innerHTML = '';
@@ -1032,16 +1043,16 @@ function removeElement(id) {
   if (el) el.remove();
 }
 
-function autoResize(el) {
+window.autoResize = function(el) {
   el.style.height = 'auto';
   el.style.height = Math.min(el.scrollHeight, 120) + 'px';
 }
 
-function handleKey(e) {
+window.handleKey = function(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
-function toast(msg) {
+window.toast = function(msg) {
   const t = document.getElementById('toast');
   t.textContent = msg;
   t.classList.add('show');
